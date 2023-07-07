@@ -1,0 +1,1 @@
+Please dnt forget to add your openai API Key in config.env file
