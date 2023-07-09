@@ -7,7 +7,7 @@ const fs = require("fs");
 
 exports.chatbot = async (req, res) => {
   const { text } = req.body;
-  const VECTOR_STORE_PATH = `greetinganddata.index`;
+  const VECTOR_STORE_PATH = `greetinganddata8-7-2023.index`;
 
   const model = new OpenAI({
     openAIApiKey: process.env.OPENAI_API_KEY,
