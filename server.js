@@ -19,11 +19,12 @@ var rawBodySaver = function (req, res, buf, encoding) {
 };
 app.use(bodyParser.json({ verify: rawBodySaver, extended: true }));
 
-const port = process.env.WEBSITES_PORT || 8080;
-//const port =4242;
+// const port = process.env.WEBSITES_PORT || 8080;
+const port =4242;
 app.use(express.json());
 
 //connect our routes
+
 app.use("/api/openai", require("./routes/openai"));
 app.use(errorHandler);
 

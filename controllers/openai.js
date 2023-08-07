@@ -1,12 +1,26 @@
 const { OpenAI } = require("langchain/llms/openai");
+const { Configuration, OpenAIApi } = require("openai");
 const { OpenAIEmbeddings } = require("langchain/embeddings/openai");
 const { HNSWLib } = require("langchain/vectorstores/hnswlib");
 const { RetrievalQAChain } = require("langchain/chains");
 const { RecursiveCharacterTextSplitter } = require("langchain/text_splitter");
 const fs = require("fs");
 
-exports.chatbot = async (req, res) => {
-  const { text } = req.body;
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
+
+async function transcribe(file) {
+  const transcript = await openai.createTranscription(
+    fs.createReadStream(file),
+    "whisper-1"
+  );
+  return transcript.data.text;
+}
+
+async function GetAnswer(text) {
+  const lowerText = text.toString().toLowerCase();
   const VECTOR_STORE_PATH = `greetinganddata8-7-2023.index`;
   const model = new OpenAI({
     openAIApiKey: process.env.OPENAI_API_KEY,
@@ -23,14 +37,17 @@ exports.chatbot = async (req, res) => {
   const chain = RetrievalQAChain.fromLLM(model, vectorStore.asRetriever());
 
   const resp = await chain.call({
-    query: text,
+    query: lowerText,
   });
+  return resp;
+}
 
+async function CheckDntKnow(resp) {
   if (
     resp.text.includes("I don't know") ||
     resp.text.includes("not mentioned in the context")
   ) {
-
+    console.log(resp.text);
     function randomIntFromInterval() {
       return Math.floor(Math.random() * (4 - 0 + 1) + 0);
     }
@@ -43,10 +60,25 @@ exports.chatbot = async (req, res) => {
       "My training is specific to CFR 49 192-199 and Part 40 regulations, so I'm unable to provide the information you're looking for.",
       "As an AI developed with a focus on CFR 49 192-199 and Part 40 regulations, I'm unable to fulfill your request. I'm here to provide assistance within these specific domains.",
     ];
-    return res.status(200).json(answers[rndInt]);
-
-    console.log("found");
+    return answers[rndInt];
+  } else {
+    return resp.text;
   }
+}
 
-  return res.status(200).json(resp.text);
+exports.chatbot = async (req, res) => {
+  const { text } = req.body;
+
+  const resp = await GetAnswer(text);
+  const refinedAnswerText = await CheckDntKnow(resp);
+
+  return res.status(200).json({ reply: refinedAnswerText });
+};
+
+exports.audiochat = async (req, res) => {
+  const data = await transcribe(req.file.path);
+  const resp = await GetAnswer(data);
+  const refinedAnswerText = await CheckDntKnow(resp);
+
+  return res.status(200).json({ question: data, reply: refinedAnswerText });
 };
