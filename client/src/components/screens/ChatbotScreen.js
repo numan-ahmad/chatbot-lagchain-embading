@@ -45,6 +45,8 @@ const ChatbotScreen = () => {
         }
       );
 
+      console.log(ResponseData);
+
       setQuestionArray((prevItems) => [
         ...prevItems,
         ResponseData.data.question,
