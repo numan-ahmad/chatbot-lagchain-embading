@@ -47,7 +47,7 @@ async function GPTResponse(text) {
       {
         role: "system",
         content:
-          "If the user sends a greeting text then greet in return. As an AI with expertise in Gas regulations  CFR 49 192-199 and Part 40 regulations, your task is to elaborate the incomming response, explain it in detail",
+          "If the user sends a greeting text then greet in return. As an AI with expertise in Gas regulations  CFR 49 192-199 and Part 40 regulations, your task is to elaborate the incomming response, explain it in detail and Answer in a concise and informative way, using bullet points to highlight the key points. Output should always be a complete sentence",
       },
       {
         role: "user",
