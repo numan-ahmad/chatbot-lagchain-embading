@@ -41,14 +41,13 @@ async function GetAnswer(text) {
     console.log("Vector Exists..");
     vectorStore = await HNSWLib.load(VECTOR_STORE_PATH, new OpenAIEmbeddings());
   }
-  // const vectorStoreRetriever = vectorStore.asRetriever();
+  const vectorStoreRetriever = vectorStore.asRetriever();
 
-  const SYSTEM_TEMPLATE = `If the user sends a greeting text then greet in return. As an AI with expertise in Gas regulations CFR 49 192-199 and Part 40 regulations, your task is to elaborate the incomming response, explain it in detail and Answer in a concise and informative way, using bullet points to highlight the key points. Output should always be a complete sentence. ---------------- {context}`;
+  const SYSTEM_TEMPLATE = `As an AI with chatbot you have to decide if customer is greeting or not, if the customer is sending greeting text reply to greetback the customer. If you don't know then reply : My training is specific to CFR 49 192-199 and Part 40 regulations, so I'm unable to provide the information you're looking for. Answer in a concise and informative way, using bullet points to highlight the key points if needed. Output should always be a complete sentence. ...... ${lowerText}`;
 
-  const messages = [
-    SystemMessagePromptTemplate.fromTemplate(SYSTEM_TEMPLATE),
-    HumanMessagePromptTemplate.fromTemplate("{question}"),
-  ];
+  // const messages = [SystemMessagePromptTemplate.fromTemplate(SYSTEM_TEMPLATE)];
+
+  const messages = [HumanMessagePromptTemplate.fromTemplate(SYSTEM_TEMPLATE)];
   const prompt = ChatPromptTemplate.fromMessages(messages);
 
   // const chain = RunnableSequence.from([
@@ -65,13 +64,9 @@ async function GetAnswer(text) {
 
   // console.log(answer, "8888888888888888888888");
 
-  const chain = RetrievalQAChain.fromLLM(
-    model,
-    vectorStore.asRetriever(),
-    {
-      prompt: prompt,
-    }
-  );
+  const chain = RetrievalQAChain.fromLLM(model, vectorStore.asRetriever(), {
+    prompt: prompt,
+  });
 
   // const chain = new RetrievalQAChain({
   //   combineDocumentsChain: loadQARefineChain(model),
@@ -88,10 +83,11 @@ async function GetAnswer(text) {
 exports.chatbot = async (req, res) => {
   const { text } = req.body;
   const resp = await GetAnswer(text);
-
+  console.log(resp, "387917823729137921378912");
+  const outputString = resp.text.replace(/^[^:]*:\s*/, "");
   return res.status(200).json({
     question: text,
-    reply: resp.text,
+    reply: outputString,
   });
 
   // const classify = await GPTClassify(text);
