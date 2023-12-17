@@ -121,34 +121,40 @@ exports.chatbot = async (req, res) => {
 
 exports.audiochat = async (req, res) => {
   const text = await Transcribe(req.file.path);
+  const resp = await GetAnswer(text);
+  const outputString = resp.text.replace(/^[^:]*:\s*/, "");
+  return res.status(200).json({
+    question: text,
+    reply: outputString,
+  });
 
-  let refinedAnswerText = "";
+  // let refinedAnswerText = "";
 
-  const classify = await GPTClassify(text);
-  if (classify === "1") {
-    const resp = await GetAnswer(text);
+  // const classify = await GPTClassify(text);
+  // if (classify === "1") {
+  //   const resp = await GetAnswer(text);
 
-    if (
-      resp.text.includes("I don't know") ||
-      resp.text.includes("not mentioned in the context")
-    ) {
-      refinedAnswerText = await GPTResponseDontKnow(
-        `Q:${text}\nAnswer:${resp.text}`
-      );
-    } else {
-      refinedAnswerText = await GPTResponse(`Q:${text}\nAnswer:${resp.text}`);
-    }
+  //   if (
+  //     resp.text.includes("I don't know") ||
+  //     resp.text.includes("not mentioned in the context")
+  //   ) {
+  //     refinedAnswerText = await GPTResponseDontKnow(
+  //       `Q:${text}\nAnswer:${resp.text}`
+  //     );
+  //   } else {
+  //     refinedAnswerText = await GPTResponse(`Q:${text}\nAnswer:${resp.text}`);
+  //   }
 
-    return res.status(200).json({
-      question: text,
-      reply: refinedAnswerText,
-    });
-  }
-  if (classify === "0") {
-    const resp = await GPTGreet(`${text}`);
-    return res.status(200).json({
-      question: text,
-      reply: resp,
-    });
-  }
+  //   return res.status(200).json({
+  //     question: text,
+  //     reply: refinedAnswerText,
+  //   });
+  // }
+  // if (classify === "0") {
+  //   const resp = await GPTGreet(`${text}`);
+  //   return res.status(200).json({
+  //     question: text,
+  //     reply: resp,
+  //   });
+  // }
 };
