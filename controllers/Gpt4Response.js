@@ -84,8 +84,8 @@ async function Transcribe(filepath) {
   return transcription.text;
 }
 
-exports.GPTResponse = GPTResponse;
-exports.GPTResponseDontKnow = GPTResponseDontKnow;
-exports.GPTClassify = GPTClassify;
-exports.GPTGreet = GPTGreet;
+// exports.GPTResponse = GPTResponse;
+// exports.GPTResponseDontKnow = GPTResponseDontKnow;
+// exports.GPTClassify = GPTClassify;
+// exports.GPTGreet = GPTGreet;
 exports.Transcribe = Transcribe;

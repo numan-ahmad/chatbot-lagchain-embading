@@ -17,13 +17,7 @@ const {
 const { StringOutputParser } = require("langchain/schema/output_parser");
 
 const fs = require("fs");
-const {
-  GPTResponse,
-  GPTResponseDontKnow,
-  GPTClassify,
-  GPTGreet,
-  Transcribe,
-} = require("./Gpt4Response.js");
+const { Transcribe } = require("./Gpt4Response.js");
 
 const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
